@@ -24,6 +24,12 @@ export function TaskBoard() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultCategory, setDefaultCategory] = useState<Category>("daily-chores");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [categoryNames, setCategoryNames] = useState<Record<Category, string>>({
+    'daily-chores': 'Daily Chores',
+    'work': 'Work', 
+    'academics': 'Academics',
+    'social-fun': 'Social & Fun'
+  });
 
   const { data: tasks = [], isLoading, refetch } = useTasks();
   const createTaskMutation = useCreateTask();
@@ -121,6 +127,13 @@ export function TaskBoard() {
     setDraggedTask(task || null);
   };
 
+  const handleUpdateCategoryName = (category: Category, newName: string) => {
+    setCategoryNames(prev => ({
+      ...prev,
+      [category]: newName
+    }));
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -139,7 +152,7 @@ export function TaskBoard() {
         });
         toast({
           title: "Task moved",
-          description: `Task moved to ${categoryConfig[newCategory].name}`,
+          description: `Task moved to ${categoryNames[newCategory]}`,
         });
       } catch (error) {
         toast({
@@ -211,6 +224,8 @@ export function TaskBoard() {
                 onAddTask={handleAddTask}
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
+                categoryName={categoryNames[category]}
+                onUpdateCategoryName={handleUpdateCategoryName}
               />
             ))}
           </div>
